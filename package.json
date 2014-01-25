@@ -1,0 +1,8 @@
+{
+    "name": "BethelApi",
+    "version": "0.0.1",
+    "dependencies": {
+        "mongojs": "0.10",
+        "restify": "2.x"
+    }
+}
