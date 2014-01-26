@@ -18,8 +18,8 @@ server.get('/', restify.serveStatic({directory : './public', default : 'index.ht
 
 var PODCAST = '/podcast'
 server.get({path : PODCAST , version : '0.0.1'}, podcast.showAllPodcastMedia);
-server.get({path : PODCAST + '/:podcastId', version : '0.0.1'}, podcast.findAssociatedPodcastMedia);
-server.get({path : PODCAST + '/:podcastId/:mediaId', version : '0.0.1'}, podcast.findPodcastMedia);
+server.get({path : PODCAST + '/all/:podcastId', version : '0.0.1'}, podcast.findAssociatedPodcastMedia);
+server.get({path : PODCAST + '/:mediaId', version : '0.0.1'}, podcast.findPodcastMedia);
 server.post({path : PODCAST , version: '0.0.1'}, podcast.updatePodcastMedia);
 server.del({path : PODCAST + '/:podcastId/:mediaId', version: '0.0.1'}, podcast.deletePodcastMedia);
 
