@@ -1,8 +1,10 @@
 var mongojs = require('mongojs'),
+    restify = require('restify'),
     db      = mongojs('127.0.0.1:27017/podcast', ['podcast']),
     media   = db.collection('media'),
     storage = db.collection('storage'),
     s3Sync  = require('cron').CronJob,
+  vimeoSync = require('cron').CronJob
     AWS     = require('aws-sdk'),
     S       = require('string');
 
@@ -36,6 +38,32 @@ new s3Sync('0 */5 * * * *', function() {
             });
         });
     });
+}, null, true, 'America/New_York');
+
+new vimeoSync('0 */6 * * * *', function() {
+  console.log('Syncing Vimeo podcasts.');
+
+  storage.find({type: "vimeo"}, function(err, success) {
+      var client = restify.createJsonClient({
+          url: 'https://vimeo.com',
+          version: '*'
+      });
+      success.forEach(function(sync) {
+          var page = 1;
+          do {              
+              client.get('/api/v2/' + sync.vimeo + '/videos.json?page=' + page, function(err, req, res, obj) {
+                  obj.forEach(function(video) {
+                      video.tags.split(', ').forEach(function(tag) {
+                          if (sync.tags.indexOf(tag.toLowerCase()) >= 0) {
+                              media.update({uuid: video.id, podcast: Number(sync.uuid)}, {$set: {title: video.title, date:new Date(video.upload_date), description: video.description, tags: video.tags.split(', '), duration: video.duration, thumbnail: video.thumbnail_small, uuid: video.id, podcast: Number(sync.uuid)}}, { upsert: true });
+                          }
+                      });
+                  });
+              });
+              page++;
+          } while (page <= 3);
+      });
+  });
 }, null, true, 'America/New_York');
 
 module.exports = {
@@ -73,17 +101,11 @@ module.exports = {
         });
     },
     updatePodcastMedia: function (req, res, next) {
-        var newMedia = {};
-        newMedia.title = req.params.title;
-        newMedia.date = new Date(req.params.date);
-        newMedia.description = req.params.description;
-        newMedia.duration = req.params.duration;
-
         setHeaders(res);
 
-        media.update({_id: mongojs.ObjectId(req.params.mediaId)}, {$set: newMedia}, {upsert: true}, function (err, success) {
+        media.update({_id: mongojs.ObjectId(req.params.mediaId)}, {$set: req.params.payload}, {upsert: true}, function (err, success) {
             if (success) {
-                res.send(201, newMedia);
+                res.send(201, req.params.payload);
                 return next();
             }
             return next(err);
