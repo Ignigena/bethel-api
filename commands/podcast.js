@@ -23,7 +23,7 @@ module.exports = {
     findAssociatedPodcastMedia: function (req, res, next) {
         setHeaders(res);
 
-        media.find({podcast: Number(req.params.podcastId)}, function (err, success) {
+        media.find({podcast: Number(req.params.podcastId)}).sort({date: -1}, function (err, success) {
             if (success) {
                 res.send(200, success);
                 return next();
