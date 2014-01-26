@@ -74,21 +74,14 @@ module.exports = {
     },
     updatePodcastMedia: function (req, res, next) {
         var newMedia = {};
-        newMedia.podcast = Number(req.params.podcastId);
-        newMedia.uuid = req.params.mediaId;
         newMedia.title = req.params.title;
         newMedia.date = new Date(req.params.date);
         newMedia.description = req.params.description;
         newMedia.duration = req.params.duration;
 
-        var query = {$and: [ {podcast: Number(req.params.podcastId)}, {uuid: req.params.mediaId} ]};
-        if (req.params.existingMediaId) {
-            query = {_id: mongojs.ObjectId(req.params.existingMediaId)};
-        }
-
         setHeaders(res);
 
-        media.update(query, {$set: newMedia}, { upsert: true }, function (err, success) {
+        media.update({_id: mongojs.ObjectId(req.params.mediaId)}, {$set: newMedia}, {upsert: true}, function (err, success) {
             if (success) {
                 res.send(201, newMedia);
                 return next();
