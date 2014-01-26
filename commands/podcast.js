@@ -34,7 +34,7 @@ module.exports = {
     findPodcastMedia: function (req, res, next) {
         setHeaders(res);
 
-        media.find({podcast: Number(req.params.podcastId), uuid: req.params.mediaId}, function (err, success) {
+        media.findOne({$and: [ {podcast: Number(req.params.podcastId)}, {uuid: req.params.mediaId} ]}, {_id: 1}, function (err, success) {
             if (success) {
                 res.send(200, success);
                 return next();
