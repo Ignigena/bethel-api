@@ -20,14 +20,14 @@ new s3Sync('0 */5 * * * *', function() {
 
     storage.find({type: "s3"}, function(err, success) {
         success.forEach(function(sync) {
-            s3.listObjects({Bucket: 'bethel-podcaster', Prefix: sync.user+'/'+sync.uuid+'/'}, function(err, data) {
+            s3.listObjects({Bucket: 'cloud.bethel.io', Prefix: sync.user+'/'+sync.uuid+'/'}, function(err, data) {
                 var storageUsed = 0;
                 data['Contents'].shift();
                 console.log('Syncing ' + data['Contents'].length + ' items in ' + sync.user + '/' + sync.uuid);
 
                 data['Contents'].forEach(function(item) {
                     var s3media = S(item['ETag']).replaceAll('"', '').s;
-                    media.update({uuid: s3media, podcast: Number(sync.uuid)}, {$set: {url: 'http://bethel-podcaster.s3-website-us-east-1.amazonaws.com/' + item['Key'], size: item['Size'], uuid: s3media, podcast: Number(sync.uuid)}}, { upsert: true });
+                    media.update({uuid: s3media, podcast: Number(sync.uuid)}, {$set: {url: 'http://cloud.bethel.io/' + item['Key'], size: item['Size'], uuid: s3media, podcast: Number(sync.uuid)}}, { upsert: true });
                     storageUsed += item['Size'];
                 });
 
