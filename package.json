@@ -2,7 +2,11 @@
     "name": "BethelApi",
     "version": "0.0.1",
     "dependencies": {
+        "aws-sdk": "2.x",
+        "cron": "1.x",
         "mongojs": "0.10",
-        "restify": "2.x"
+        "restify": "2.x",
+        "string": "1.x",
+        "time": "0.10"
     }
 }

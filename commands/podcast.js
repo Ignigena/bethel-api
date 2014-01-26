@@ -1,12 +1,37 @@
 var mongojs = require('mongojs'),
-    db = mongojs('127.0.0.1:27017/podcast', ['podcast']),
-    media = db.collection('media');
+    db      = mongojs('127.0.0.1:27017/podcast', ['podcast']),
+    media   = db.collection('media'),
+    storage = db.collection('storage'),
+    s3Sync  = require('cron').CronJob,
+    AWS     = require('aws-sdk'),
+    S       = require('string');
 
 function setHeaders(res) {
     res.cache('public', {maxAge: 600});
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Vary', 'Accept-Encoding');
 }
+
+AWS.config.loadFromPath('/var/config/aws.json');
+var s3 = new AWS.S3();
+
+new s3Sync('0 */5 * * * *', function() {
+    console.log('Syncing podcast storage.');
+
+    storage.find({type: "s3"}, function(err, success) {
+        success.forEach(function(sync) {
+            s3.listObjects({Bucket: 'bethel-podcaster', Prefix: sync.user+'/'+sync.uuid+'/'}, function(err, data) {
+                data['Contents'].shift();
+                console.log('Syncing ' + data['Contents'].length + ' items in ' + sync.user + '/' + sync.uuid);
+
+                data['Contents'].forEach(function(item) {
+                    var s3media = S(item['ETag']).replaceAll('"', '').s;
+                    media.update({uuid: s3media, podcast: Number(sync.uuid)}, {$set: {url: 'http://bethel-podcaster.s3-website-us-east-1.amazonaws.com/' + item['Key'], size: item['Size'], uuid: s3media, podcast: Number(sync.uuid)}}, { upsert: true });
+                });
+            });
+        });
+    });
+}, null, true, 'America/New_York');
 
 module.exports = {
     showAllPodcastMedia: function (req, res, next) {
@@ -58,7 +83,7 @@ module.exports = {
 
         setHeaders(res);
 
-        media.update(query, newMedia, { upsert: true }, function (err, success) {
+        media.update(query, {$set: newMedia}, { upsert: true }, function (err, success) {
             if (success) {
                 res.send(201, newMedia);
                 return next();
