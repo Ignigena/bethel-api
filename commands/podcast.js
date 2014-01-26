@@ -44,7 +44,7 @@ module.exports = {
     },
     updatePodcastMedia: function (req, res, next) {
         var newMedia = {};
-        newMedia.podcast = req.params.podcastId;
+        newMedia.podcast = Number(req.params.podcastId);
         newMedia.uuid = req.params.mediaId;
         newMedia.title = req.params.title;
         newMedia.date = new Date(req.params.date);
