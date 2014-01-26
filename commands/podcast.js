@@ -3,7 +3,7 @@ var mongojs = require('mongojs'),
     media = db.collection('media');
 
 function setHeaders(res) {
-    res.cache('_public_', {maxAge: 600});
+    res.cache('public', {maxAge: 600});
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Vary', 'Accept-Encoding');
 }
