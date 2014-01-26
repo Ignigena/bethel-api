@@ -51,7 +51,7 @@ module.exports = {
         newMedia.description = req.params.description;
         newMedia.duration = req.params.duration;
 
-        var query = {};
+        var query = {$and: [ {podcast: Number(req.params.podcastId)}, {uuid: req.params.mediaId} ]};
         if (req.params.existingMediaId) {
             query = {_id: mongojs.ObjectId(req.params.existingMediaId)};
         }
