@@ -1,6 +1,6 @@
-var mongojs = require('mongojs');
-var db = mongojs('127.0.0.1:27017/podcast', ['podcast']);
-var media = db.collection('media');
+var mongojs = require('mongojs'),
+    db = mongojs('127.0.0.1:27017/podcast', ['podcast']),
+    media = db.collection('media');
 
 function setHeaders(res) {
     res.cache('_public_', {maxAge: 600});
