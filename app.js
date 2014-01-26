@@ -14,7 +14,7 @@ server.use(restify.bodyParser());
 server.use(restify.CORS());
 server.use(restify.gzipResponse());
 
-server.get('/', restify.serveStatic({directory : './public'}));
+server.get('/', restify.serveStatic({directory : './public', default : 'index.html'}));
 
 var PODCAST = '/podcast'
 server.get({path : PODCAST , version : '0.0.1'}, podcast.showAllPodcastMedia);
