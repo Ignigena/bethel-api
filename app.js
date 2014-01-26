@@ -14,7 +14,7 @@ server.use(restify.bodyParser());
 server.use(restify.CORS());
 server.use(restify.gzipResponse());
 
-server.get('/', welcome);
+server.get('/', restify.serveStatic({directory : './public'}));
 
 var PODCAST = '/podcast'
 server.get({path : PODCAST , version : '0.0.1'}, podcast.showAllPodcastMedia);
@@ -26,7 +26,3 @@ server.del({path : PODCAST + '/:podcastId/:mediaId', version: '0.0.1'}, podcast.
 server.listen(port ,ip_addr, function() {
     console.log('%s listening at %s ', server.name, server.url);
 });
-
-function welcome(req, res, next) {
-  res.send('Bethel API');
-}
