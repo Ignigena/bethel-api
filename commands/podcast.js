@@ -42,7 +42,7 @@ module.exports = {
             return next(err);
         });
     },
-    postNewPodcastMedia: function (req, res, next) {
+    updatePodcastMedia: function (req, res, next) {
         var newMedia = {};
         newMedia.podcast = req.params.podcastId;
         newMedia.uuid = req.params.mediaId;
@@ -51,18 +51,20 @@ module.exports = {
         newMedia.description = req.params.description;
         newMedia.duration = req.params.duration;
 
+        var query = {};
+        if (req.params.existingMediaId) {
+            query = {_id: mongojs.ObjectId(req.params.existingMediaId)};
+        }
+
         setHeaders(res);
 
-        media.save(newMedia, function (err, success) {
+        media.update(query, newMedia, { upsert: true }, function (err, success) {
             if (success) {
                 res.send(201, newMedia);
                 return next();
             }
             return next(err);
         });
-    },
-    editPodcastMedia: function (req, res, next) {
-        //@todo Implement.
     },
     deletePodcastMedia: function (req, res, next) {
         setHeaders(res);
