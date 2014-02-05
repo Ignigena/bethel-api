@@ -6,6 +6,7 @@
         "cron": "1.x",
         "mongojs": "0.10",
         "moment": "2.x",
+        "node-ffprobe": "1.x",
         "restify": "2.x",
         "string": "1.x",
         "time": "0.10"

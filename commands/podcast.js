@@ -1,6 +1,7 @@
 var mongojs = require('mongojs'),
     restify = require('restify'),
     moment  = require('moment'),
+    probe   = require('node-ffprobe'),
     db      = mongojs('127.0.0.1:27017/podcast', ['podcast']),
     stats   = db.collection('stats'),
     media   = db.collection('media'),
@@ -31,12 +32,27 @@ new s3Sync('0 */5 * * * *', function() {
 
                 data['Contents'].forEach(function(item) {
                     var s3media = S(item['ETag']).replaceAll('"', '').s;
-                    media.update({uuid: s3media, podcast: Number(sync.uuid)}, {$set: {url: 'http://cloud.bethel.io/' + item['Key'], size: item['Size'], uuid: s3media, podcast: Number(sync.uuid)}}, { upsert: true });
+                    media.update({uuid: s3media, podcast: Number(sync.uuid)}, {$set: {url: 'http://cloud.bethel.io/' + item['Key'], size: item['Size'], uuid: s3media, podcast: Number(sync.uuid), type: 'cloud'}}, { upsert: true });
                     storageUsed += item['Size'];
                 });
 
                 storage.update({_id: sync._id}, {$set: {storage: storageUsed}});
                 console.log(storageUsed + ' storage used.');
+            });
+        });
+    });
+    
+    media.find({type: "cloud", duration: ""}, function(err, success) {
+        success.forEach(function(item) {
+            probe(item.url, function(err, probeData) {
+                var itemDuration = moment.duration(probeData.streams[0].duration, 's'),
+                    humanDuration = "";
+                if (itemDuration.hours() >= 1) {
+                    humanDuration = moment().startOf('day').add(itemDuration).format('HH:mm:ss');
+                } else {
+                    humanDuration = moment().startOf('day').add(itemDuration).format('mm:ss');
+                }
+                media.update({_id: item._id}, {$set: {duration: humanDuration}}, { upsert: true });
             });
         });
     });
