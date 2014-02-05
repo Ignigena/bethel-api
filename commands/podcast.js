@@ -1,6 +1,8 @@
 var mongojs = require('mongojs'),
     restify = require('restify'),
+    moment  = require('moment'),
     db      = mongojs('127.0.0.1:27017/podcast', ['podcast']),
+    stats   = db.collection('stats'),
     media   = db.collection('media'),
     storage = db.collection('storage'),
     s3Sync  = require('cron').CronJob,
@@ -121,5 +123,20 @@ module.exports = {
             }
             return next(err);
         })
+    },
+    updateHitCount: function (req, res, next) {
+        setHeaders(res);
+
+        var weekNumber = moment().week();
+        var update = {};
+        update[weekNumber] = 1;
+
+        stats.update({podcast: req.params.podcastId}, {$inc: update}, {upsert: true}, function (err, success) {
+            if (success) {
+                res.send(200, req.params.podcastId);
+                return next();
+            }
+            return next(err);
+        });
     }
 };
