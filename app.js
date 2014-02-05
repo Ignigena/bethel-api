@@ -22,7 +22,7 @@ server.get({path : PODCAST + '/all/:podcastId', version : '0.0.1'}, podcast.find
 server.get({path : PODCAST + '/:mediaId', version : '0.0.1'}, podcast.findPodcastMedia);
 server.post({path : PODCAST , version: '0.0.1'}, podcast.updatePodcastMedia);
 server.del({path : PODCAST + '/:podcastId/:mediaId', version: '0.0.1'}, podcast.deletePodcastMedia);
-server.get({path : PODCAST + '/:podcastId/hit' , version: '0.0.1'}, podcast.updateHitCount);
+server.post({path : PODCAST + '/:podcastId/hit' , version: '0.0.1'}, podcast.updateHitCount);
 
 server.listen(port ,ip_addr, function() {
     console.log('%s listening at %s ', server.name, server.url);
