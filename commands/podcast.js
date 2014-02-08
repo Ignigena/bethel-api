@@ -154,5 +154,23 @@ module.exports = {
             }
             return next(err);
         });
+    },
+    getSubscribers: function (req, res, next) {
+        setHeaders(res);
+
+        var weekNumber = moment().week();
+        
+        stats.findOne({podcast: req.params.podcastId}, function (err, success) {
+            if (success) {
+                var subscribers = 0;
+                subscribers += Math.round(success[weekNumber-1]/7);
+                if (subscribers == 0) {
+                  subscribers += Math.round(success[weekNumber]/moment().day());
+                }
+                res.send(200, {subscribers: Math.round(success[weekNumber]/7)});
+                return next();
+            }
+            return next(err);
+        });
     }
 };
