@@ -169,6 +169,8 @@ module.exports = {
                 }
                 res.send(200, {subscribers: Math.round(success[weekNumber]/7)});
                 return next();
+            } else {
+                res.send(200, {subscribers: 0});
             }
             return next(err);
         });
