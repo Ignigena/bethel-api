@@ -174,5 +174,18 @@ module.exports = {
             }
             return next(err);
         });
+    },
+    findAssociatedMedia: function (req, res, next) {
+        setHeaders(res);
+
+        media.findOne({podcast: Number(req.params.podcastId), 'reference.id': Number(req.params.nodeId)}, function (err, success) {
+            if (success) {
+                res.send(200, success);
+                return next();
+            } else {
+                res.send(200, {});
+            }
+            return next(err);
+        });
     }
 };

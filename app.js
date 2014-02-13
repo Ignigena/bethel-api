@@ -25,6 +25,7 @@ server.post({path : PODCAST , version: '0.0.1'}, podcast.updatePodcastMedia);
 server.del({path : PODCAST + '/:podcastId/:mediaId', version: '0.0.1'}, podcast.deletePodcastMedia);
 server.post({path : PODCAST + '/:podcastId/hit' , version: '0.0.1'}, podcast.updateHitCount);
 server.get({path : PODCAST + '/:podcastId/subscribers' , version: '0.0.1'}, podcast.getSubscribers);
+server.get({path : PODCAST + '/:podcastId/associated/:nodeId' , version: '0.0.1'}, podcast.findAssociatedMedia);
 
 var USER = '/user';
 server.get({path : USER + '/:uid/locations', version : '0.0.1'}, location.showAllLocations);
