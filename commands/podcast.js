@@ -42,17 +42,21 @@ new s3Sync('0 */5 * * * *', function() {
         });
     });
     
-    media.find({type: "cloud", duration: ""}, function(err, success) {
+    media.find({type: "cloud", duration: {$exists: false}}, function(err, success) {
         success.forEach(function(item) {
-            probe(item.url, function(err, probeData) {
-                var itemDuration = moment.duration(probeData.streams[0].duration, 's'),
-                    humanDuration = "";
-                if (itemDuration.hours() >= 1) {
-                    humanDuration = moment().startOf('day').add(itemDuration).format('HH:mm:ss');
-                } else {
-                    humanDuration = moment().startOf('day').add(itemDuration).format('mm:ss');
+            probe(encodeURI(item.url), function(err, probeData) {
+                if (probeData) {
+                    var itemDuration = moment.duration(probeData.streams[0].duration, 's'),
+                        humanDuration = "";
+                    if (itemDuration.hours() >= 1) {
+                        humanDuration = moment().startOf('day').add(itemDuration).format('HH:mm:ss');
+                    } else {
+                        humanDuration = moment().startOf('day').add(itemDuration).format('mm:ss');
+                    }
+                    media.update({_id: item._id}, {$set: {duration: humanDuration}}, { upsert: true });
+                } else if (err) {
+                    console.log(err);
                 }
-                media.update({_id: item._id}, {$set: {duration: humanDuration}}, { upsert: true });
             });
         });
     });
