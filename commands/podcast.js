@@ -32,7 +32,7 @@ new s3Sync('0 */5 * * * *', function() {
 
                 data['Contents'].forEach(function(item) {
                     var s3media = S(item['ETag']).replaceAll('"', '').s;
-                    media.update({uuid: s3media, podcast: Number(sync.uuid)}, {$set: {url: 'http://cloud.bethel.io/' + item['Key'], size: item['Size'], uuid: s3media, podcast: Number(sync.uuid), type: 'cloud'}}, { upsert: true });
+                    media.update({uuid: s3media, podcast: Number(sync.uuid)}, {$set: {url: 'http://cloud.bethel.io/' + item['Key'], size: item['Size'], uuid: s3media, podcast: Number(sync.uuid), type: 'cloud'},$setOnInsert: {date: item['LastModified'] }}, { upsert: true });
                     storageUsed += item['Size'];
                 });
 
