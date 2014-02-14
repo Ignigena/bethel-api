@@ -20,7 +20,7 @@ function setHeaders(res) {
 AWS.config.loadFromPath('/var/config/aws.json');
 var s3 = new AWS.S3();
 
-new s3Sync('0 */5 * * * *', function() {
+function syncCloudStorage() {
     console.log('Syncing podcast storage.');
 
     storage.find({type: "s3"}, function(err, success) {
@@ -60,6 +60,10 @@ new s3Sync('0 */5 * * * *', function() {
             });
         });
     });
+}
+
+new s3Sync('0 */5 * * * *', function() {
+  syncCloudStorage();
 }, null, true, 'America/New_York');
 
 new vimeoSync('0 */6 * * * *', function() {
@@ -185,7 +189,7 @@ module.exports = {
     findAssociatedMedia: function (req, res, next) {
         setHeaders(res);
 
-        media.find({podcast: Number(req.params.podcastId), 'reference.id': Number(req.params.nodeId)}, function (err, success) {
+        media.find({podcast: Number(req.params.podcastId), 'reference.id': Number(req.params.nodeId)}).sort({date: -1}, function (err, success) {
             if (success) {
                 res.send(200, success);
                 return next();
@@ -194,5 +198,10 @@ module.exports = {
             }
             return next(err);
         });
+    },
+    syncStorage: function (req, res, next) {
+        setHeaders(res);
+        syncCloudStorage();
+        res.send(200, 'ok');
     }
 };
