@@ -185,7 +185,7 @@ module.exports = {
     findAssociatedMedia: function (req, res, next) {
         setHeaders(res);
 
-        media.findOne({podcast: Number(req.params.podcastId), 'reference.id': Number(req.params.nodeId)}, function (err, success) {
+        media.find({podcast: Number(req.params.podcastId), 'reference.id': Number(req.params.nodeId)}, function (err, success) {
             if (success) {
                 res.send(200, success);
                 return next();
