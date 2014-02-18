@@ -129,7 +129,7 @@ module.exports = {
     updatePodcastMedia: function (req, res, next) {
         setHeaders(res);
 
-        if (req.params.payload.reference.id) {
+        if (req.params.payload.reference) {
           req.params.payload.reference.id = Number(req.params.payload.reference.id);
         }
         media.update({_id: mongojs.ObjectId(req.params.mediaId)}, {$set: req.params.payload}, {upsert: true}, function (err, success) {
