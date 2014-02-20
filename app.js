@@ -30,6 +30,7 @@ server.post({path : PODCAST + '/do/sync', version : '0.0.1'}, podcast.syncStorag
 
 var USER = '/user';
 server.get({path : USER + '/:uid/locations', version : '0.0.1'}, location.showAllLocations);
+server.post({path : USER + '/:uid/locations', version : '0.0.1'}, location.createLocations);
 
 server.listen(port ,ip_addr, function() {
     console.log('%s listening at %s ', server.name, server.url);

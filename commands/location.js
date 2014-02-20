@@ -20,5 +20,18 @@ module.exports = {
             }
             return next(err);
         });
+    },
+    createLocations: function (req, res, next) {
+        setHeaders(res);
+
+        location.insert(req.params.location);
+        
+        location.find(req.params.location, function(err, success) {
+            if (success) {
+                res.send(200, {'locations':success});
+                return next();
+            }
+            return next(err);
+        });
     }
 };
