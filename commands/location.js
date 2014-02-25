@@ -10,6 +10,17 @@ function setHeaders(res) {
 }
 
 module.exports = {
+    findLocations: function (req, res, next) {
+        setHeaders(res);
+
+        db.runCommand( { geoNear: "location", near: [ Number(req.params.lng), Number(req.params.lat) ], maxDistance: req.params.rad / 6371, distanceMultiplier: 6371, spherical: true }, function(err, success) {
+            if (success) {
+                res.send(200, success);
+                return next();
+            }
+            return next(err);
+        });
+    },
     showAllLocations: function (req, res, next) {
         setHeaders(res);
 
