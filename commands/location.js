@@ -13,7 +13,7 @@ module.exports = {
     showAllLocations: function (req, res, next) {
         setHeaders(res);
 
-        location.find({uid: Number(req.params.uid)},function (err, success) {
+        location.find({uid: Number(req.params.uid)}).sort({title: 1},function (err, success) {
             if (success) {
                 res.send(200, {'locations':success});
                 return next();
