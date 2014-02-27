@@ -36,3 +36,6 @@ server.get({path : '/locations/:lat/:lng/:rad', version : '0.0.1'}, location.fin
 server.listen(port ,ip_addr, function() {
     console.log('%s listening at %s ', server.name, server.url);
 });
+
+// Start sails and pass it command line arguments
+require('sails').lift();
